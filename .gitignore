@@ -1,0 +1,29 @@
+# Environment variables (CRITICAL SECURITY)
+.env
+.env*.local
+
+# Python caching & builds
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Next.js / Node / Frontend
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
