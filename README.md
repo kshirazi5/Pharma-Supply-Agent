@@ -85,6 +85,27 @@ docker build -t pharma-supply .
 docker run -p 8000:8000 --env-file .env pharma-supply
 ```
 
+### 4. Deploy to Google Cloud Run
+
+The container reads Cloud Run's injected `$PORT`, so deployment is a single command
+(run from a clone of this repo in Cloud Shell or with the gcloud CLI):
+
+```bash
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+
+gcloud run deploy pharma-supply-api \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --memory 2Gi \
+  --set-env-vars "GOOGLE_API_KEY=<key>,SUPABASE_URL=<url>,SUPABASE_KEY=<key>,SECRET_KEY=<secret>,ADMIN_PASSWORD=<pw>,MANAGER_PASSWORD=<pw>,PROCUREMENT_BUDGET=50000,APPROVAL_THRESHOLD=10000,SLACK_BOT_TOKEN=<token>,SLACK_TEAM_ID=<team>,SLACK_CHANNEL=#supply-chain"
+```
+
+Secrets are passed as Cloud Run environment variables — `.env` is git-ignored and never
+baked into the image. After deploying, verify at `<service-url>/` (health check) and
+`<service-url>/docs` (interactive API). To point the frontend at the deployed API, set
+`NEXT_PUBLIC_API_URL=<service-url>` and add your frontend origin to `ALLOWED_ORIGIN`.
+
 ## Supabase Tables
 
 Run `db/schema.sql` in your Supabase SQL editor to create:
