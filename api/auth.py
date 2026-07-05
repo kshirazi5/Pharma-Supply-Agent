@@ -22,9 +22,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 router        = APIRouter(prefix="/api/auth", tags=["auth"])
 
 # ── In-memory user store (replace with real DB in production) ─────────────────
+# Passwords come from .env so no credentials live in source control.
 USERS = {
-    "admin": {"username": "admin", "password": "pharma_admin_2024", "role": "admin"},
-    "manager": {"username": "manager", "password": "pharma_mgr_2024", "role": "manager"},
+    "admin": {
+        "username": "admin",
+        "password": os.environ.get("ADMIN_PASSWORD", "demo_admin"),
+        "role": "admin",
+    },
+    "manager": {
+        "username": "manager",
+        "password": os.environ.get("MANAGER_PASSWORD", "demo_manager"),
+        "role": "manager",
+    },
 }
 
 

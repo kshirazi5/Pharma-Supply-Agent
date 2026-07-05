@@ -4,11 +4,23 @@ A production-grade, 5-agent AI system for pharmaceutical supply-chain management
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    U[User uploads sales CSV<br/>Next.js Dashboard] -->|JWT auth| API[FastAPI Backend]
+    API --> O[Orchestrator Agent<br/>gemini-2.5-flash]
+    O --> DA[Data Agent<br/>gemini-2.0-flash<br/>validate CSV + engineer features]
+    DA --> FA[Forecast Agent<br/>gemini-2.0-flash<br/>XGBoost + LR surge prediction]
+    FA --> RA[Risk Agent<br/>gemini-2.5-flash<br/>risk scoring · anomaly detection<br/>budget optimisation · approval gating]
+    RA --> AA[Alert Agent<br/>gemini-2.0-flash<br/>Slack notifications via MCP]
+
+    RA <-->|recall + log decisions| DB[(Supabase<br/>decisions · outcomes · pending_approvals)]
+    RA -->|cost > threshold| HITL{Human approval<br/>required?}
+    HITL -->|yes| AP[Approvals Panel<br/>manager sign-off]
+    AP -->|approve / reject| DB
+    AA --> SL[Slack channel]
 ```
-CSV Upload → Data Agent → Forecast Agent → Risk Agent → Alert Agent
-                                               ↑
-                                          Orchestrator
-```
+
+**Pipeline:** CSV Upload → Data Agent → Forecast Agent → Risk Agent → Alert Agent, coordinated by the Orchestrator. High-value orders pause for human approval (long-running operation); every decision is logged to Supabase so the Risk Agent learns from past false-positive surges (long-term memory).
 
 | Agent | Model | Responsibility |
 |-------|-------|----------------|
@@ -17,6 +29,19 @@ CSV Upload → Data Agent → Forecast Agent → Risk Agent → Alert Agent
 | Risk Agent | gemini-2.5-flash | Anomaly detection, budget optimisation, approval gating |
 | Alert Agent | gemini-2.0-flash | Slack notifications |
 | Orchestrator | gemini-2.5-flash | Pipeline coordination |
+
+## Course Concepts Demonstrated
+
+| Concept | Where |
+|---------|-------|
+| Multi-agent system (ADK) | `agents/` — 4 sequential sub-agents coordinated by a root orchestrator (`agents/orchestrator.py`) |
+| MCP Server | `mcp/slack_setup.py` — Slack MCP server for agent notifications |
+| Custom tools | `tools/` — 7 tool modules (forecasting, risk, anomaly, memory, approvals, alerts, data) |
+| Long-running operations | Human-in-the-loop approval gate: orders above threshold pause as `pending_approvals` and resume on manager sign-off (`api/approvals.py`) |
+| Sessions & long-term memory | Supabase-backed decision memory: `recall_past_decisions` / `log_decision` in `tools/memory_tools.py` temper confidence using historical false-surge rates |
+| Security features | JWT auth (`api/auth.py`), role-based approval, all secrets in `.env` (never committed), CORS restrictions |
+| Deployability | `Dockerfile` for containerised deployment (Cloud Run-ready) |
+| Gemini | All 5 agents powered by Gemini 2.0/2.5 Flash |
 
 ## Drug Categories (8 ATC)
 
@@ -50,7 +75,7 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 cd frontend
 npm run dev
 # Open http://localhost:3000
-# Login: admin / pharma_admin_2024
+# Login with the ADMIN_PASSWORD / MANAGER_PASSWORD credentials you set in .env
 ```
 
 ### 3. Docker

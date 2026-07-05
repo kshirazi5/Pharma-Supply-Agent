@@ -17,7 +17,7 @@ export default function LoginForm() {
     try {
       await login(username, password);
     } catch {
-      setError("Invalid credentials. Try admin / pharma_admin_2024");
+      setError("Invalid credentials.");
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,7 @@ export default function LoginForm() {
           </form>
 
           <p className="text-slate-500 text-xs text-center mt-6">
-            Demo: <span className="text-slate-400">admin</span> / <span className="text-slate-400">pharma_admin_2024</span>
+            Demo login: <span className="text-slate-400">admin</span> / the ADMIN_PASSWORD from the backend .env
           </p>
         </div>
       </div>
