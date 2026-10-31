@@ -188,3 +188,7 @@ pharma-supply-agent/
 ├── .env.example
 └── Dockerfile
 ```
+
+## AI assistance
+
+I used Claude (Anthropic) to review this repository from a hiring manager's perspective and to help implement the holdout evaluation (`ml/evaluate.py`), the pytest suite, the manager-only approval check, and fail-fast secret handling. I ran the evaluation and tests myself, reviewed every change, and can explain each one. The agent system, API, and dashboard were built by Minahil Saba and me for the Kaggle capstone.
