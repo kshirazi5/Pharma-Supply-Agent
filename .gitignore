@@ -27,3 +27,9 @@ yarn-error.log*
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Trained models are rebuilt from data/ by ml/train.py and ml/train_anomaly.py
+ml/models/*.pkl
+
+# Test cache
+.pytest_cache/

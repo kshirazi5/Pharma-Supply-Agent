@@ -1,0 +1,7 @@
+model,MAE,RMSE,WAPE (pooled)
+Random Forest,3.324,4.407,0.422
+"Ensemble (XGB + RF average, used by the app)",3.328,4.42,0.423
+XGBoost,3.384,4.508,0.43
+7-day moving average,3.452,4.555,0.438
+Naive (yesterday),4.44,5.941,0.564
+Seasonal naive (same day last week),4.449,5.941,0.565

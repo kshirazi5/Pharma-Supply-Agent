@@ -10,6 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Train the forecast, surge and anomaly models at build time, so model files
+# never need to be committed to the repo
+RUN python -m ml.train && python -m ml.train_anomaly
+
 EXPOSE 8000
 
 # Cloud Run injects $PORT (8080); fall back to 8000 for local docker runs

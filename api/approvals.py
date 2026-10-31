@@ -47,6 +47,9 @@ def action_approval(
         action       : "approve" or "reject"
         reviewer_note: Optional explanation.
     """
+    if current_user.get("role") != "manager":
+        raise HTTPException(status_code=403, detail="Only a manager can approve or reject held orders")
+
     if body.action not in ("approve", "reject"):
         raise HTTPException(status_code=400, detail="action must be 'approve' or 'reject'")
 

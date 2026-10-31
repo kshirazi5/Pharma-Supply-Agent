@@ -1,0 +1,9 @@
+drug,Seasonal naive (same day last week),7-day moving average,"Ensemble (XGB + RF average, used by the app)"
+M01AB,0.594,0.445,0.432
+M01AE,0.572,0.436,0.438
+N02BA,0.686,0.531,0.523
+N02BE,0.397,0.32,0.305
+N05B,0.529,0.416,0.391
+N05C,1.508,1.302,1.257
+R03,1.038,0.773,0.745
+R06,0.689,0.499,0.494

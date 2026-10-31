@@ -88,7 +88,7 @@ def train(data_path: str = DATA_PATH):
         y_surge = build_surge_labels(y)
         lr_pipe = Pipeline([
             ("scaler", StandardScaler()),
-            ("lr", LogisticRegression(max_iter=500, random_state=42)),
+            ("lr", LogisticRegression(max_iter=500, class_weight="balanced", random_state=42)),
         ])
         lr_pipe.fit(X, y_surge)
         joblib.dump(lr_pipe, os.path.join(MODEL_DIR, f"{col}_surge_lr.pkl"))

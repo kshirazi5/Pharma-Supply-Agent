@@ -5,6 +5,7 @@ JWT-based authentication helpers for the FastAPI backend.
 """
 from __future__ import annotations
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,24 +15,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "change_me_in_production")
+def _require_env(name: str) -> str:
+    """Read a required secret from the environment; refuse to start without it."""
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(
+            f"{name} is not set. Copy .env.example to .env and set it, "
+            "or pass it as an environment variable."
+        )
+    return value
+
+
+SECRET_KEY = _require_env("SECRET_KEY")
 ALGORITHM  = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8  # 8 hours
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 router        = APIRouter(prefix="/api/auth", tags=["auth"])
 
-# ── In-memory user store (replace with real DB in production) ─────────────────
-# Passwords come from .env so no credentials live in source control.
+# Demo user store: two fixed roles with passwords from the environment.
+# A real deployment would use a user table with hashed passwords.
 USERS = {
     "admin": {
         "username": "admin",
-        "password": os.environ.get("ADMIN_PASSWORD", "demo_admin"),
+        "password": _require_env("ADMIN_PASSWORD"),
         "role": "admin",
     },
     "manager": {
         "username": "manager",
-        "password": os.environ.get("MANAGER_PASSWORD", "demo_manager"),
+        "password": _require_env("MANAGER_PASSWORD"),
         "role": "manager",
     },
 }
@@ -67,7 +79,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
 @router.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = USERS.get(form_data.username)
-    if not user or user["password"] != form_data.password:
+    # constant-time comparison so response timing does not leak password contents
+    if not user or not secrets.compare_digest(
+        user["password"].encode(), form_data.password.encode()
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

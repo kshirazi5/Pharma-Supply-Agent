@@ -86,7 +86,7 @@ The project evolved through three versions. V1 was a single agent that called on
 
 The hardest design decision was where to put the intelligence. Early versions let the LLM compute order quantities — impressive in demos, unreliable in practice. The final architecture uses deterministic ML models and optimisation code for the *numbers*, and Gemini agents for the *judgment*: interpreting signals, applying workflow rules, writing human-readable reasoning for every logged decision. LLMs decide *what matters*; code decides *how much*.
 
-Trained on a real Kaggle pharma sales dataset (2014–2019, 8 ATC categories), the ensemble forecaster achieves solid accuracy on held-out data, and the anomaly detector correctly flags injected synthetic spikes while letting seasonal surges through.
+Trained on a real Kaggle pharma sales dataset (2014–2019, 8 ATC categories), the ensemble forecaster cuts error by 25% against a same-day-last-week baseline on a held-out final year (WAPE 0.42 vs 0.57), with a smaller gain over a 7-day moving average (0.44), and the anomaly detector correctly flags injected synthetic spikes while letting seasonal surges through.
 
 ## Value
 
